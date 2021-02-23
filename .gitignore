@@ -1,3 +1,8 @@
+JC_*
+personal.txt
+accounts.json
+tools/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
