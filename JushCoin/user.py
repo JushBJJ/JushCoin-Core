@@ -23,24 +23,27 @@ class user:
 
     def createAccount(self, username, password):
         if os.path.exists("accounts.json"):
-            success = False
-
-            with open("accounts.json", "r") as f:
+            with open("accounts.json", "r+") as f:
                 accounts = json.loads(f.read())
                 hashedUsername = self.hash(username)
 
                 if hashedUsername not in accounts:
                     self.id = len(accounts)
                     self.address = createAddress(username, self.id)
-                    success = True
+                    self.username = hashedUsername
+
+                    # Clear file
+                    f.seek(0)
+                    f.truncate()
+
+                    accounts[self.username] = json.dumps(self.__dict__)
+                    print(accounts)
+                    f.write(json.dumps(accounts))
 
                 else:
                     print("Account already exists.")
 
-            if success:
-                self.save()
-                return self
-            return False
+            return
         else:
             with open("accounts.json", "w") as f:
                 self.id = 0
@@ -53,7 +56,7 @@ class user:
                 }
                 f.write(json.dumps(account))
 
-            return self
+            return
 
     def fixFile(self):
         if not os.path.exists("accounts.json"):
