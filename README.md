@@ -4,7 +4,7 @@ Inspired by bitcoin and my teacher's blockchain.
 
 # Roadmap [Sorted by Priority]
 
-- [ ] Organize and comment code.
+- [x] Organize and comment code.
 - [ ] Proper Account Information database (MongoDB)
 - [ ] Public and Private Key
 - [ ] Using Scrypt for Password Hashing
