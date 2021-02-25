@@ -27,8 +27,6 @@ class Block:
         self.highestDifficulty = 0
         self.reward = random.randrange(0, chain.split)
 
-        print("reward: ", self.reward)
-
         self.mined = False
         self.miner = miner  # Address
 

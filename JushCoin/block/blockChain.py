@@ -89,7 +89,7 @@ class BlockChain:
 
         return False
 
-    def addBlock(self, block: block, hash: str, verifiedHash: str) -> bool:
+    def addBlock(self, block: block.Block, hash: str, verifiedHash: str) -> bool:
         """
         addBlock: Add block to the confirmed chains.
 
@@ -165,10 +165,10 @@ class BlockChain:
 
             self.addBlock(newBlock, proof, verifiedBlockHash)
             self.reward += newBlock.reward
-            return True
+            return True, newBlock.miner
 
         print("Unable to mine block.")
-        return False
+        return False, None
 
 
 def createDummyBlock(chain: BlockChain):

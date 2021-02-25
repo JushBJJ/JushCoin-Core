@@ -110,7 +110,7 @@ class Universe:
         self.unconfirmedBlockChains[newID] = blockChain.BlockChain(self, minerAddress, newID)
         return newID
 
-    def mineChain(self, chainID: str, blocks: int, load: bool = False, block: block = block) -> Any:
+    def mineChain(self, chainID: str, blocks: int, load: bool = False, loadedBlock: block.Block = None) -> Any:
         """
         mineChain: Mine a specific chain.
 
@@ -126,25 +126,25 @@ class Universe:
         chainID = str(chainID)
         ret = [None, None]
         totalReward = 0
+        miner = ""
 
         # Load or Create new block.
-        new_block = block if load else None
+        new_block = loadedBlock if load else None
 
         if chainID in self.unconfirmedBlockChains.keys():
-
-            block = self.unconfirmedBlockChains[chainID]
+            chain = self.unconfirmedBlockChains[chainID]
 
             # Mine x blocks in the blockchain.
             for _ in range(blocks):
-                ret[1] = block.mine(load=load, block=new_block)
-                totalReward += block.reward
+                ret[1], miner = chain.mine(load=load, block=new_block)
+                totalReward += chain.reward
                 load = False
 
                 if ret != False and ret != True:
                     break
 
-            self.addChain(block)
-            ret[0] = self.transaction(block.miner, totalReward, f"Mined in blockchain and earned {totalReward} Jush Coins.")
+            self.addChain(chain)
+            ret[0] = self.transaction(miner, totalReward, f"Mined in blockchain and earned {totalReward} Jush Coins.")
         return ret[0], ret[1]
 
     def continueSession(self, blockInfo: Dict[str, Any], minerAddress: str, blocks: int):
