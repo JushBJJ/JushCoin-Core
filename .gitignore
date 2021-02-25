@@ -2,6 +2,7 @@ JC_*
 personal.txt
 accounts.json
 tools/
+personal/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

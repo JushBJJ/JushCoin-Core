@@ -1,25 +1,45 @@
+from typing import Any
 import block.block as block
 import hashlib
 import base64
 import json
 
+JushCoinSig = "1f60deedb323271b360bbcb58743f120904a00ca7b4b37ac81120c7c32c16ef4"
+
 
 class BlockChain:
-    def __init__(self, universe,  miner, newID: str):
-        self.JushCoinSig = "1f60deedb323271b360bbcb58743f120904a00ca7b4b37ac81120c7c32c16ef4"
+    def __init__(self, universe: Any,  miner: str, newID: str):
+        """
+        __init__: Init new blockchain.
+
+        Args:
+            universe (Any): Universe class.
+            miner (str): Miner address.
+            newID (str): ID of the blockchain.
+        """
+
         self.confirmed = False
+        self.miner = miner  # Address
         self.chain = dict({})  # Unconfirmed Transactions
-        self.difficulty = 15
+
+        self.difficulty = 1
+        self.reward = 0
+
         self.limit = universe.supply
         self.split = universe.reward
         self.chainID = newID
-        self.miner = miner  # Address
-        self.reward = 0
 
         self.createGenesis()
 
     @property
     def lastBlock(self):
+        """
+        lastBlock: Get last block.
+
+        Returns:
+            self: self
+        """
+
         try:
             lastKey = list(self.chain.keys())[-1]
             last = self.chain[int(lastKey)]
@@ -29,25 +49,58 @@ class BlockChain:
         return last
 
     def createGenesis(self):
+        """
+        createGenesis: Create Genesis block.
+        """
+
         if len(self.chain.keys()) == 0:
             hash = block.Block(self.miner, self, "0").getInfo()["hash"]
             self.chain[0] = hashlib.sha256(str(hash).encode()).hexdigest()
 
     def getChain(self):
+        """
+        getChain Returns self but encoded as base64.
+
+        Returns:
+            str: Base64 encode.
+        """
+
         return base64.b64encode(str(json.dumps(self.__dict__, sort_keys=True)).encode())
 
-    def verify(self, block, hash):
+    def verify(self, block: block, hash: str) -> bool:
+        """
+        verify: Verify block.
+
+        Args:
+            block (block): Block
+            hash (str): hash of the block.
+
+        Returns:
+            bool: Returns whether it meets the criteria.
+        """
+
         if block.mined:
             rewardHash = hashlib.sha256(str(block.reward).encode()).hexdigest()
 
             difficulty = hash.startswith("0"*self.difficulty)
             checkReward = rewardHash == hash[66:]
 
-            return difficulty and checkReward
+            return bool(difficulty and checkReward)
 
         return False
 
-    def addBlock(self, block, hash, verifiedHash):
+    def addBlock(self, block: block, hash: str, verifiedHash: str) -> bool:
+        """
+        addBlock: Add block to the confirmed chains.
+
+        Args:
+            block (block): Block.
+            hash (str): Hash of the block.
+            verifiedHash (str): Verified hash.
+
+        Returns:
+            bool: True if verified, False if unable to mine block.
+        """
         if self.verify(block, hash):
             self.chain[len(self.chain)] = verifiedHash
             print(f"1 Block Mined.\n\tReward: {block.reward}\n\tNonce: {block.nonce}")
@@ -56,7 +109,17 @@ class BlockChain:
         print("Unable to add block.")
         return False
 
-    def proofWork(self, block):
+    def proofWork(self, block: block) -> Any:
+        """
+        proofWork: Proof of work algorithm.
+
+        Args:
+            block (block): block.Block to be mined.
+
+        Returns:
+            Any: Returns block hash or "Save Session".
+        """
+
         computedHash = block.computeHash()
         blockHash = ""
 
@@ -81,7 +144,7 @@ class BlockChain:
             print("Save Session...")
             return "Save Session"
 
-    def mine(self, load=False, **kwargs):
+    def mine(self, load: bool = False, **kwargs) -> Any:
         if load:
             newBlock = kwargs["block"]
         else:
@@ -90,7 +153,7 @@ class BlockChain:
         proof = self.proofWork(newBlock)
 
         if proof == "Save Session":
-            session = json.dumps(newBlock.__dict__)
+            session = newBlock.__dict__
             return session
 
         elif proof != False:
@@ -108,5 +171,14 @@ class BlockChain:
         return False
 
 
-def createDummyBlock(chain):
-    return block.Block(None, chain, "")
+def createDummyBlock(chain: BlockChain):
+    """
+    createDummyBlock Create Dummy Block using chain.
+
+    Args:
+        chain (BlockChain): Blockchain
+
+    Returns:
+        block: block.Blockclass
+    """
+    return block.Block("", chain, "")
