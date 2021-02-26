@@ -136,16 +136,16 @@ class Universe:
 
             # Mine x blocks in the blockchain.
             for _ in range(blocks):
-                ret[1], miner = chain.mine(load=load, block=new_block)
+                ret[1] = chain.mine(load=load, block=new_block)
                 totalReward += chain.reward
                 load = False
 
-                if ret != False and ret != True:
+                if ret[1] != False and ret[1] != True:
                     break
 
             self.addChain(chain)
             ret[0] = self.transaction(miner, totalReward, f"Mined in blockchain and earned {totalReward} Jush Coins.")
-        return ret[0], ret[1]
+        return ret
 
     def continueSession(self, blockInfo: Dict[str, Any], minerAddress: str, blocks: int):
         """
@@ -170,7 +170,7 @@ class Universe:
                 setattr(sessionBlock, key, blockInfo[key])
 
         self.unconfirmedBlockChains[index] = chain
-        return self.mineChain(index, blocks, load=True, block=sessionBlock)
+        return self.mineChain(index, blocks, load=True, loadedBlock=sessionBlock)
 
     def restartUniverse(self):
         """

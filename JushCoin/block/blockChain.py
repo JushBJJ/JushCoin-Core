@@ -22,7 +22,7 @@ class BlockChain:
         self.miner = miner  # Address
         self.chain = dict({})  # Unconfirmed Transactions
 
-        self.difficulty = 1
+        self.difficulty = 8
         self.reward = 0
 
         self.limit = universe.supply
@@ -67,7 +67,7 @@ class BlockChain:
 
         return base64.b64encode(str(json.dumps(self.__dict__, sort_keys=True)).encode())
 
-    def verify(self, block: block, hash: str) -> bool:
+    def verify(self, block: block.Block, hash: str) -> bool:
         """
         verify: Verify block.
 
@@ -109,7 +109,7 @@ class BlockChain:
         print("Unable to add block.")
         return False
 
-    def proofWork(self, block: block) -> Any:
+    def proofWork(self, block: block.Block) -> Any:
         """
         proofWork: Proof of work algorithm.
 
@@ -165,10 +165,10 @@ class BlockChain:
 
             self.addBlock(newBlock, proof, verifiedBlockHash)
             self.reward += newBlock.reward
-            return True, newBlock.miner
+            return True
 
         print("Unable to mine block.")
-        return False, None
+        return False
 
 
 def createDummyBlock(chain: BlockChain):
